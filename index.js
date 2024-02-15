@@ -9,30 +9,32 @@ const base = "./articles";
 
 app.get("/", function (req, res) {
   let md =
-    '<head><link rel="stylesheet" href="/index.css" type="text/css"></head><body>';
+    '<head><link rel="stylesheet" href="/index.css" type="text/css"></link></head><body>';
   if (fs.existsSync(`${base}/header.md`)) {
     md += convertMarkdown(
       fs.readFileSync(`${base}/header.md`, { encoding: "utf-8" })
     );
   }
 
-  for (const dirName of fs.readdirSync(base)) {
-    const directory = `${base}/${dirName}`;
-    md += "<article>";
-    if (fs.lstatSync(directory).isDirectory()) {
-      if (fs.existsSync(`${directory}/title.md`)) {
-        md += `<a href='/${dirName}'>${convertMarkdown(
-          fs.readFileSync(`${directory}/title.md`, { encoding: "utf-8" })
-        )}</a>`;
+  if (fs.existsSync(base)) {
+    for (const dirName of fs.readdirSync(base)) {
+      const directory = `${base}/${dirName}`;
+      md += "<article>";
+      if (fs.lstatSync(directory).isDirectory()) {
+        if (fs.existsSync(`${directory}/title.md`)) {
+          md += `<a href='/${dirName}'>${convertMarkdown(
+            fs.readFileSync(`${directory}/title.md`, { encoding: "utf-8" })
+          )}</a>`;
 
-        if (fs.existsSync(`${directory}/summary.md`)) {
-          md += convertMarkdown(
-            fs.readFileSync(`${directory}/summary.md`, { encoding: "utf-8" })
-          );
+          if (fs.existsSync(`${directory}/summary.md`)) {
+            md += convertMarkdown(
+              fs.readFileSync(`${directory}/summary.md`, { encoding: "utf-8" })
+            );
+          }
         }
       }
+      md += "</article>";
     }
-    md += "</article>";
   }
 
   if (fs.existsSync(`${base}/footer.md`)) {
